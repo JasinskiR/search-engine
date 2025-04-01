@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Search</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center my-4">Recipe Search</h1>
+        
+        <div class="search-box mb-4">
+            <form id="searchForm" class="d-flex">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search for recipes...">
+                <button type="submit" class="btn btn-primary ms-2">Search</button>
+            </form>
+        </div>
+        
+        <div id="resultsContainer" class="row">
+            <!-- Results will appear here -->
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const query = document.getElementById('searchInput').value;
+            
+            fetch('/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `query=${encodeURIComponent(query)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById('resultsContainer');
+                container.innerHTML = '';
+                
+                if (data.length === 0) {
+                    container.innerHTML = '<p class="text-center">No recipes found. Try a different search term.</p>';
+                    return;
+                }
+                
+                data.forEach(recipe => {
+                    const card = document.createElement('div');
+                    card.className = 'col-md-4 mb-4';
+                    card.innerHTML = `
+                        <div class="card h-100">
+                            <img src="${recipe.image}" class="card-img-top" alt="${recipe.title}" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+                            <div class="card-body">
+                                <h5 class="card-title">${recipe.title}</h5>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="badge bg-info">${recipe.total_time}</span>
+                                    <span class="badge bg-success">${recipe.servings}</span>
+                                    ${recipe.rating ? `<span class="badge bg-warning">⭐ ${recipe.rating}</span>` : ''}
+                                </div>
+                                <p class="card-text">${recipe.description}</p>
+                                <div class="mb-2">
+                                    <h6>Ingredients:</h6>
+                                    <ul class="ingredient-list">
+                                        ${recipe.ingredients.slice(0, 3).map(ing => `<li>${ing}</li>`).join('')}
+                                        ${recipe.ingredients.length > 3 ? '<li>...</li>' : ''}
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-footer bg-transparent">
+                                <a href="${recipe.url}" target="_blank" class="btn btn-primary">View Recipe</a>
+                                <span class="float-end text-muted">Score: ${recipe.score.toFixed(3)}</span>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            });
+        });
+
+        // Load some initial recipes on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('searchForm').dispatchEvent(new Event('submit'));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+body {
+    background-color: #f8f9fa;
+    padding-bottom: 50px;
+}
+
+.search-box {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.card {
+    transition: transform 0.2s;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
+
+.ingredient-list {
+    padding-left: 20px;
+    margin-bottom: 0;
+    font-size: 0.9rem;
+}
+
+.ingredient-list li {
+    margin-bottom: 2px;
+}
+
+.badge {
+    font-size: 0.8rem;
+}
